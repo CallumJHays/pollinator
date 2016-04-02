@@ -14,7 +14,11 @@ function generateApp(baseURL){
     , mongoose = require('mongoose')
     , sass = require('node-sass')
   
-  mongoose.connect(process.env.DATABASE_URL);
+  // if not already connected from other means, connect.
+  if(mongoose.connection.readyState == 0){
+    mongoose.connect(process.env.DATABASE_URL);
+  }
+  
   var Poll = mongoose.model('Poll', new mongoose.Schema({
     question: String,
     author: String,
