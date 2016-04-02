@@ -8,11 +8,12 @@ function generateApp(baseURL){
     , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
     , mongoose = require('mongoose')
     , mongooseFindOrCreate = require('mongoose-findorcreate')
-    , url = require('url')
+    , urljoin = require('url-join')
     , express = require('express')
     , bodyParser = require('body-parser')
     , mongoose = require('mongoose')
     , sass = require('node-sass')
+    , path = require('path')
   
   // if not already connected from other means, connect.
   if(mongoose.connection.readyState == 0){
@@ -30,7 +31,8 @@ function generateApp(baseURL){
     
   var app = express.Router();
   
-  var fullBaseURL = url.resolve(process.env.APP_URL, baseURL);
+  var fullBaseURL = urljoin(process.env.APP_URL, baseURL);
+  console.log(fullBaseURL);
     
   app.use(bodyParser.urlencoded({ extended: true }));
   
@@ -58,10 +60,12 @@ function generateApp(baseURL){
     cb(null, obj);
   });
   
+  console.log( urljoin(fullBaseURL, "/auth/twitter/callback/"));
+  
   passport.use(new TwitterStrategy({
       consumerKey: process.env.TWITTER_KEY,
       consumerSecret: process.env.TWITTER_SECRET,
-      callbackURL: url.resolve(fullBaseURL, "/auth/twitter/callback")
+      callbackURL: urljoin(fullBaseURL, "/auth/twitter/callback/")
     },
     function(token, tokenSecret, profile, cb) {
       User.findOrCreate({twitter_id: profile._json.id},
@@ -83,7 +87,7 @@ function generateApp(baseURL){
   passport.use(new FacebookStrategy({
       clientID: process.env.FACEBOOK_KEY,
       clientSecret: process.env.FACEBOOK_SECRET,
-      callbackURL: url.resolve(fullBaseURL, "/auth/facebook/callback"),
+      callbackURL: urljoin(fullBaseURL, "/auth/facebook/callback"),
       profileFields: ['id', 'displayName', 'photos']
     },
     function(accessToken, refreshToken, profile, cb) {
@@ -107,7 +111,7 @@ function generateApp(baseURL){
   passport.use(new GithubStrategy({
       clientID: process.env.GITHUB_KEY,
       clientSecret: process.env.GITHUB_SECRET,
-      callbackURL: url.resolve(fullBaseURL, "/auth/github/callback")
+      callbackURL: urljoin(fullBaseURL, "/auth/github/callback")
     },
     function(accessToken, refreshToken, profile, cb) {
       User.findOrCreate({ github_id: profile.id },
@@ -131,7 +135,7 @@ function generateApp(baseURL){
   passport.use(new GoogleStrategy({
       clientID: process.env.GOOGLE_KEY,
       clientSecret: process.env.GOOGLE_SECRET,
-      callbackURL: url.resolve(fullBaseURL, "/auth/google/callback"), 
+      callbackURL: urljoin(fullBaseURL, "/auth/google/callback"), 
       scope: ["profile"]
     },
     function(accessToken, refreshToken, profile, cb) {
@@ -332,7 +336,7 @@ function generateApp(baseURL){
     res.setHeader('Content-Type', 'text/css')
     var filename = req.params.filename.match(/(.*).css/)[1];
     sass.render({
-      file: __dirname + '/views/' + filename + '.sass'
+      file: path.join(__dirname + '/views/' + filename + '.sass')
     }, function(err, result){
         if(err) console.log(err);
         res.end(result.css);
