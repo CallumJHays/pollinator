@@ -30,7 +30,7 @@ function generateApp(baseURL){
     
   var app = express.Router();
   
-  var fullBaseURL = url.resolve(process.env.APP_URL, baseURL, "/auth/google/callback");
+  var fullBaseURL = url.resolve(process.env.APP_URL, baseURL);
     
   app.use(bodyParser.urlencoded({ extended: true }));
   
