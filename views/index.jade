@@ -1,0 +1,54 @@
+extends ./layout.jade
+
+block content
+    .jumbotron
+        h1 Pollinator
+        p Let your polls flourish
+        button.btn.btn-default(data-toggle="modal" data-target="#findPollModal") Find Poll
+        .modal.fade#findPollModal: .modal-dialog: .modal-content
+            .modal-header
+                button.close(data-dismiss="modal") &times;
+                h4.modal-title Find A Poll
+            .modal-body
+                form(action=baseURL + "/viewpoll")
+                    label(for="#modalSearchID") Search by ID
+                    .input-group.searchbar
+                        input.form-control(name="id" type="text" placeholder="Search by ID" id="modalSearchID")
+                        span.input-group-addon
+                            button(type="submit"): i.glyphicon.glyphicon-search
+                hr
+                form(action=baseURL + "/search")
+                    label(for="#modalSearchKeyword") Search by Keyword
+                    .input-group.searchbar
+                        input.form-control(name="keywords" type="text" placeholder="Search by Keyword" id="modalSearchKeyword")
+                        span.input-group-addon
+                            button(type="submit"): i.glyphicon.glyphicon-search
+        
+        if user
+            button.btn.btn-default(data-toggle="modal" data-target="#makePollModal") Make New Poll
+            .modal.fade#makePollModal
+                .modal-dialog: .modal-content
+                    .modal-header
+                        button.close(data-dismiss="modal") &times;
+                        h4.modal-title Make New Poll
+                    #pollMaker
+                    script.
+                        ReactDOM.render(
+                            Components.PollMaker(),
+                        document.getElementById('pollMaker'));
+        else
+            button.btn.btn-default(data-toggle="modal" data-target="#signInModal") Make New Poll
+    .row
+        h2.text-center Trending Polls
+        .well#trendingPolls
+        script.
+            ReactDOM.render(
+                Components.PollList({url: !{JSON.stringify(baseURL)} + "/api/trending"}),
+            document.getElementById('trendingPolls'));
+    .row
+        h2.text-center Top Polls
+        .well#topPolls
+        script.
+            ReactDOM.render(
+                Components.PollList({url: !{JSON.stringify(baseURL)} + "/api/top"}),
+            document.getElementById('topPolls'));

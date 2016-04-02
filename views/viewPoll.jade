@@ -1,0 +1,8 @@
+extends ./layout.jade
+
+block content
+    #poll
+    script.
+        ReactDOM.render(
+            Components.Poll({data: !{JSON.stringify(poll)}}),
+        $('#poll')[0])

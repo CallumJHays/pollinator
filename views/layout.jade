@@ -1,0 +1,68 @@
+doctype html
+html
+    head
+        block title
+            title Pollinator
+        script(src="https://code.jquery.com/jquery-2.2.0.min.js")
+        script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", integrity="sha256-KXn5puMvxCw+dAYznun+drMdG1IFl3agK0p/pqT9KAo= sha512-2e8qq0ETcfWRI4HJBzQiA3UoyFk6tbNyG+qSaIBZLyW9Xf3sWZHN/lxe9fTh1U45DpPf07yj94KsUHHWe4Yk1A==", crossorigin="anonymous")
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", rel="stylesheet", integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw==", crossorigin="anonymous")
+        link(href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css", rel="stylesheet")
+        link(rel="stylesheet" href= baseURL + "/css/main.css")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react.js")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-dom.js")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js")
+        script(src= baseURL + "/components.js")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        - var usr = (user) ? (JSON.stringify(user)) : ("''");
+        script.
+            var user = !{usr};
+            var ip = '#{ip}';
+            (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) return;
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=990575274356630";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        
+    nav.navbar.navbar-default
+        .container
+            .navbar-header
+                button.navbar-toggle.collapsed(data-toggle="collapse" data-target="#navigationMenu") Menu
+                a.navbar-brand(href="/") Pollinator
+            .collapse.navbar-collapse#navigationMenu
+                if user
+                    ul.nav.navbar-nav.navbar-right
+                        li.dropdown
+                            a.dropdown-toggle(data-toggle="dropdown" href="#")
+                                span.navbar-text #{user.name}
+                                img(src=user.imageURL)
+                                i.caret
+                            ul.dropdown-menu
+                                li: a(href=baseURL + "/myPolls") My Polls
+                                li: a(href=baseURL + "/logout") Log Out
+                else
+                    button.btn.btn-primary.navbar-btn.navbar-right(data-toggle="modal" data-target="#signInModal") Sign in
+                    .modal.fade#signInModal
+                        .modal-dialog.modal-sm: .modal-content
+                            .modal-header
+                                button.close(data-dismiss="modal") &times;
+                                h4.modal-title Sign in
+                            .modal-body
+                                p You're just a few click away from using Pollinator!
+                                a.btn.btn-info.form-control(href="/auth/twitter")
+                                    i.fa.fa-twitter
+                                    span &nbspSign in with Twitter
+                                a.btn.btn-primary.form-control(href="/auth/facebook")
+                                    i.fa.fa-facebook
+                                    span &nbspSign in with Facebook
+                                a.btn.btn-default.form-control(href="/auth/github")
+                                    i.fa.fa-github
+                                    span &nbspSign in with Github
+                                a.btn.btn-danger.form-control(href="/auth/google")
+                                    i.fa.fa-google
+                                    span &nbspSign in with Google
+                
+  body
+    .container
+        block content

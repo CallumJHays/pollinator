@@ -1,0 +1,9 @@
+extends ./layout.jade
+
+block content
+    h2.text-center Your Polls
+    #myPollList
+    script.
+        ReactDOM.render(
+            Components.PollList({url: window.location.href + "/api/myPolls"}),
+        $('#myPollList')[0]);
