@@ -11,7 +11,11 @@ var Components = {};
   
   var Poll = React.createClass({
     getInitialState: function(){
-      return {data: this.props.data, chart: null}
+      return {
+        data: this.props.data, 
+        chart: null,
+        baseURL: this.props.baseURL
+      }
     },
     handleVoteSubmit: function(e){
       var poll = this;
@@ -19,7 +23,7 @@ var Components = {};
       $("#poll" + this.state.data._id).find('input[name="vote"]:checked').prop('disabled', true).parents('label').removeClass('option')
       $("#poll" + this.state.data._id).find('input[name="vote"]:not(:checked)').prop('disabled', false).parents('label').addClass('option')
       $(target).prop('disabled', true).text('...')
-      $.post('/api/vote', $(target).parent().find('#form' + this.state.data._id).serialize(), function(resp){
+      $.post(this.state.baseURL + '/api/vote', $(target).parent().find('#form' + this.state.data._id).serialize(), function(resp){
         poll.setState({data: resp.data, chart: poll.state.chart}, function(){
           $(target).prop('disabled', false).text('Change Vote')
           poll.resetChart();
@@ -30,7 +34,7 @@ var Components = {};
       var poll = this;
       var target = e.target;
       e.preventDefault()
-      $.post('/api/addNewOption', $(target).parents('form').serialize(), function(resp){
+      $.post(this.state.baseURL + '/api/addNewOption', $(target).parents('form').serialize(), function(resp){
         poll.setState({data: resp.data, chart: poll.state.chart}, function(){
           $(target).parents('form').find('#'+resp.data.id+resp.option).prop('checked', true)
           poll.resetChart()
@@ -83,6 +87,7 @@ var Components = {};
     render: function(){
       var poll = this;
       var data = this.state.data;
+      var baseURL = this.state.baseURL;
       var sortedData = JSON.parse(JSON.stringify(data));
       return(
         React.DOM.div({className: "poll", id: "poll" + data._id}, 
@@ -148,7 +153,7 @@ var Components = {};
             React.DOM.p({className: 'small'},"(ID: "+data._id+")")
           ),
           React.DOM.div({className: 'col-sm-6'},
-            React.DOM.div({className: "fb-share-button", "data-href": "https://pollinator-callumjhays.c9users.io/viewPoll?id=" + data._id, "data-layout": "button_count"}),
+            React.DOM.div({className: "fb-share-button", "data-href": "http://www.intrepify.com" + baseURL + "/viewPoll?id=" + data._id, "data-layout": "button_count"}),
             React.DOM.canvas({className: "chart", id: "chart" + data._id + poll.props.identifier, width: "250", height: "250"}),
             React.DOM.div({className: "chartLegend", id:"chartLegend" + data._id + poll.props.identifier}),
             (function(){
@@ -208,7 +213,7 @@ var Components = {};
                           React.DOM.p({className:"text-center text-danger lead"}, "Warning: This will remove any existing votes on this poll"),
                           React.DOM.button({className:"btn btn-warning pull-left", "data-dismiss": "modal", onClick: function(e){
                             e.preventDefault();
-                            $.post('/api/modifyPoll', $(e.target).parents('form').serialize(), function(data){
+                            $.post(baseURL + '/api/modifyPoll', $(e.target).parents('form').serialize(), function(data){
                               poll.setState({data: data, chart: poll.state.chart}, function(){
                                 poll.resetChart();
                               })
@@ -226,7 +231,7 @@ var Components = {};
                         React.DOM.button({className:"close", "data-dismiss":"modal"}, "X"),
                         React.DOM.h4({className:"modal-title"}, "Delete Poll?")
                       ),
-                      React.DOM.form({method: "POST", action:"/api/deletePoll"},
+                      React.DOM.form({method: "POST", action: baseURL + "/api/deletePoll"},
                         React.DOM.div({className:"modal-body"},
                           React.DOM.label(null, "Are you sure you want to delete this poll? This cannot be undone."),
                           React.DOM.input({type:"hidden", value: data._id, name:"poll"})
@@ -252,13 +257,14 @@ var Components = {};
     getInitialState: function(){
       return {
         url: this.props.url,
+        baseURL: this.props.baseURL,
         polls: []
       }
     },
     componentDidMount: function(){
-      var $ = window.$
-      var pollList = this
-      $.getJSON(this.state.url, function(polls){
+      var $ = window.$;
+      var pollList = this;
+      $.getJSON(this.state.baseURL + this.state.url, function(polls){
         pollList.setState({
           url: pollList.state.url,
           polls: polls
@@ -268,7 +274,8 @@ var Components = {};
       })
     },
     render: function(){
-      var url = this.props.url.match(/.*\/(.*)?$/)[1];
+      var url = this.state.url.match(/.*\/(.*)?$/)[1];
+      var baseURL = this.state.baseURL;
       return (
         React.DOM.div({className:"panel-group", id:"pollList"+url},
           this.state.polls.map(function(poll){
@@ -284,7 +291,7 @@ var Components = {};
                 ),
                 React.DOM.div({id:"pollPanel" + poll._id + url, className:"panel-collapse collapse in"},
                   React.DOM.div({className:"panel-body"},
-                    Components.Poll({data: poll, identifier: url})
+                    Components.Poll({data: poll, identifier: url, baseURL: baseURL})
                   )
                 )
               )
@@ -302,7 +309,8 @@ var Components = {};
         question: "",
         options: [{
           name: ""
-        }]
+        }],
+        baseURL: this.props.baseURL
       };
     },
     handleOptionChange: function(e){
@@ -331,7 +339,7 @@ var Components = {};
     render: function(){
       var pollMaker = this;
       return(
-        React.DOM.form({action:"/api/newPoll", method:"post"},
+        React.DOM.form({action:this.state.baseURL + "/api/newPoll", method:"post"},
           React.DOM.div({className:"modal-body"},
             React.DOM.div({className:"form-group"}, 
               React.DOM.label({htmlFor:"#questionInput"}, "Question:"),

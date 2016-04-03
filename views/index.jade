@@ -34,7 +34,7 @@ block content
                     #pollMaker
                     script.
                         ReactDOM.render(
-                            Components.PollMaker(),
+                            Components.PollMaker({baseURL: !{JSON.stringify(baseURL)}}),
                         document.getElementById('pollMaker'));
         else
             button.btn.btn-default(data-toggle="modal" data-target="#signInModal") Make New Poll
@@ -43,12 +43,12 @@ block content
         .well#trendingPolls
         script.
             ReactDOM.render(
-                Components.PollList({url: !{JSON.stringify(baseURL)} + "/api/trending"}),
+                Components.PollList({baseURL: !{JSON.stringify(baseURL)}, url: "/api/trending"}),
             document.getElementById('trendingPolls'));
     .row
         h2.text-center Top Polls
         .well#topPolls
         script.
             ReactDOM.render(
-                Components.PollList({url: !{JSON.stringify(baseURL)} + "/api/top"}),
+                Components.PollList({baseURL: !{JSON.stringify(baseURL)}, url: "/api/top"}),
             document.getElementById('topPolls'));

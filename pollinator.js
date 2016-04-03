@@ -282,7 +282,7 @@ function generateApp(baseURL){
         if(err) return res.send(err)
         poll.remove(function(err, removed){
           if(err) return res.send(err)
-          res.redirect(urljoin(baseURL + req.get('referer')));
+          res.redirect(baseURL);
         });
       })
     } catch(err){
