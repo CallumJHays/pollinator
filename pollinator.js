@@ -59,6 +59,8 @@ function generateApp(baseURL){
     cb(null, obj);
   });
   
+  console.log(urljoin(fullBaseURL, "/auth/twitter/callback/"))
+  
   passport.use(new TwitterStrategy({
       consumerKey: process.env.TWITTER_KEY,
       consumerSecret: process.env.TWITTER_SECRET,
