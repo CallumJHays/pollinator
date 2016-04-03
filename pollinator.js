@@ -32,7 +32,6 @@ function generateApp(baseURL){
   var app = express.Router();
   
   var fullBaseURL = urljoin(process.env.APP_URL, baseURL);
-  console.log(fullBaseURL);
     
   app.use(bodyParser.urlencoded({ extended: true }));
   
@@ -60,8 +59,6 @@ function generateApp(baseURL){
     cb(null, obj);
   });
   
-  console.log( urljoin(fullBaseURL, "/auth/twitter/callback/"));
-  
   passport.use(new TwitterStrategy({
       consumerKey: process.env.TWITTER_KEY,
       consumerSecret: process.env.TWITTER_SECRET,
@@ -78,10 +75,10 @@ function generateApp(baseURL){
   app.get('/auth/twitter',
     passport.authenticate('twitter'));
   app.get('/auth/twitter/callback', 
-    passport.authenticate('twitter', { failureRedirect: '/' }),
+    passport.authenticate('twitter', { failureRedirect: urljoin(baseURL + '/') }),
     function(req, res) {
       // Successful authentication, redirect home.
-      res.redirect('/');
+      res.redirect(urljoin(baseURL + '/'));
   });
   
   passport.use(new FacebookStrategy({
@@ -102,10 +99,10 @@ function generateApp(baseURL){
     passport.authenticate('facebook'));
   
   app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/' }),
+    passport.authenticate('facebook', { failureRedirect: urljoin(baseURL + '/') }),
     function(req, res) {
       // Successful authentication, redirect home.
-      res.redirect('/');
+      res.redirect(urljoin(baseURL + '/'));
   });
   
   passport.use(new GithubStrategy({
@@ -126,10 +123,10 @@ function generateApp(baseURL){
     passport.authenticate('github'));
   
   app.get('/auth/github/callback',
-    passport.authenticate('github', { failureRedirect: '/' }),
+    passport.authenticate('github', { failureRedirect: urljoin(baseURL + '/') }),
     function(req, res) {
       // Successful authentication, redirect home.
-      res.redirect('/');
+      res.redirect(urljoin(baseURL + '/'));
   });
   
   passport.use(new GoogleStrategy({
@@ -151,7 +148,7 @@ function generateApp(baseURL){
     passport.authenticate('google', {scope: ["profile"]}));
   
   app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
+    passport.authenticate('google', { failureRedirect: urljoin(baseURL + '/') }),
     function(req, res) {
       // Successful authentication, redirect home.
       res.redirect('/');
@@ -159,11 +156,11 @@ function generateApp(baseURL){
 
   app.get('/logout', function(req, res){
     req.logout();
-    res.redirect('/');
+    res.redirect(urljoin(baseURL + '/'));
   })
   
   app.get('/myPolls', function(req, res){
-    res.render(__dirname + '/views/myPolls',{
+    res.render(path.join(__dirname + '/views/myPolls'),{
       user: req.user,
       ip: req.ip,
       baseURL: baseURL
@@ -217,7 +214,7 @@ function generateApp(baseURL){
         poll.save(function(err){if(err) return console.log(err)})
       }
     }
-    res.redirect('/')
+    res.redirect(urljoin(baseURL + '/'))
   })
   
   function handleVote(req, res){
@@ -283,7 +280,7 @@ function generateApp(baseURL){
         if(err) return res.send(err)
         poll.remove(function(err, removed){
           if(err) return res.send(err)
-          res.redirect(req.get('referer'));
+          res.redirect(urljoin(baseURL + req.get('referer')));
         });
       })
     } catch(err){
